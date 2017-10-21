@@ -1,0 +1,4 @@
+.env
+.vault_pass
+deploy.retry
+.DS_Store
