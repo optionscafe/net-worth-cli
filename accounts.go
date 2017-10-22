@@ -213,7 +213,7 @@ func MarkAccountValue() {
   }
 
   // Post data
-  var postStr = []byte(`{"balance":` + os.Args[3] +  `,"date":"` + time.Now().UTC().Format("2006-01-02") + `"}`)
+  var postStr = []byte(`{"balance":` + os.Args[3] +  `,"date":"` + time.Now().In(timeZone).Format("2006-01-02") + `"}`)
 
   // Setup http client
   client := &http.Client{}    
