@@ -67,6 +67,10 @@ func main() {
     case "marks-list":
       ListMarks()
 
+     // Create ledger entry
+    case "ledger-create":
+      DoCreateLedger()     
+
     // Print Help
     case "help":
       PrintHelp()
@@ -91,7 +95,8 @@ func PrintHelp() {
   fmt.Println("\n accounts-list")
   fmt.Println("\n accounts-list {id}")
   fmt.Println("\n accounts-mark {id} {balance}")   
-  fmt.Println("\n accounts-create \"{name}\" {balance}") 
+  fmt.Println("\n accounts-create \"{name}\" {balance}")
+  fmt.Println("\n ledger-create {account_id} {date} {amount} \"{note}\"")    
   fmt.Println("")
 }
 
