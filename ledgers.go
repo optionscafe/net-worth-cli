@@ -25,13 +25,13 @@ import (
 func DoCreateLedger() {
 
   // Make sure we have the args we need.
-  if len(os.Args) < 6 {
+  if len(os.Args) < 7 {
     PrintHelp()
     return
   }
 
   // Post data
-  var postStr = []byte(`{"date":"` + os.Args[3] + `","amount":` + os.Args[4] + `,"account_id":` + os.Args[2] + `,"note":"` + os.Args[5] + `"}`);
+  var postStr = []byte(`{"date":"` + os.Args[3] + `","amount":` + os.Args[4] + `,"account_id":` + os.Args[2] + `,"category_name":"` + os.Args[5] + `","note":"` + os.Args[6] + `"}`);
 
   // Setup http client
   client := &http.Client{}    
@@ -81,6 +81,7 @@ func PrintOneLedgerRow(resBody io.ReadCloser) {
   // Get the values we need.
   id := gjson.Get(string(body), "id").String()
   account_name := gjson.Get(string(body), "account_name").String()
+  category_name := gjson.Get(string(body), "category_name").String()
   amount := gjson.Get(string(body), "amount").Float()
   date := gjson.Get(string(body), "date").String() 
   note := gjson.Get(string(body), "note").String() 
@@ -89,12 +90,12 @@ func PrintOneLedgerRow(resBody io.ReadCloser) {
   layout := "2006-01-02T15:04:05Z"
   d, _ := time.Parse(layout, date)
 
-  rows = append(rows, []string{ id, d.In(timeZone).Format("01/02/2006"), account_name, ac.FormatMoney(amount), note })
+  rows = append(rows, []string{ id, d.In(timeZone).Format("01/02/2006"), account_name, category_name, ac.FormatMoney(amount), note })
 
   fmt.Println("")
 
   // Print table and return.
-  PrintTable(rows, []string{ "Id", "Date", "Account", "Amount", "Note" })
+  PrintTable(rows, []string{ "Id", "Date", "Account", "Category", "Amount", "Note" })
 
   fmt.Println("")
 }
