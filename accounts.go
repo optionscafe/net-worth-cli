@@ -7,14 +7,13 @@
 package main
 
 import (
-  "io"
   "os"
   "fmt"
   "log"
   "time"
   "bytes"
   "net/http"
-  "io/ioutil"
+  "io/ioutil"  
   "github.com/tidwall/gjson"
   "github.com/leekchan/accounting"
   "github.com/olekukonko/tablewriter"  
@@ -82,39 +81,31 @@ func DoCreateAccount() {
     log.Fatal(fmt.Sprint("/api/v1/accounts (POST) did not return a status code of 201 -", res.StatusCode))
   }   
 
+  // Read the data we got.
+  body, _ := ioutil.ReadAll(res.Body)
+
+  if err != nil {
+    log.Fatal(err)
+  }  
+
   // Print record.
-  PrintOneAccountRow(res.Body)
+  PrintOneAccountRow(string(body))
 }
 
 //
 // List an account by id.
 //
 func AccountList() {
-  
-  // Setup http client
-  client := &http.Client{}    
-  
-  // Setup api request
-  req, _ := http.NewRequest("GET", os.Getenv("SERVER_URL") + "/api/v1/accounts/" + os.Args[2], nil)
-  req.Header.Set("Accept", "application/json")
-  req.Header.Set("Authorization", "Bearer " + os.Getenv("ACCESS_TOKEN"))   
- 
-  res, err := client.Do(req)
-      
+
+  // Make API request
+  body, err := MakeGetRequest("/api/v1/accounts/" + os.Args[2])
+
   if err != nil {
-    log.Fatal(err)  
-  }        
-  
-  // Close Body
-  defer res.Body.Close()    
-  
-  // Make sure the api responded with a 200
-  if res.StatusCode == 404 {
-    log.Fatal("No results found.")
-  }    
+    log.Fatal(err)
+  }     
 
   // Print record.
-  PrintOneAccountRow(res.Body)
+  PrintOneAccountRow(body)
 }
 
 //
@@ -131,33 +122,15 @@ func AccountsList() {
   // Set money format
   ac := accounting.Accounting{Symbol: "$", Precision: 2}  
 
-  // Setup http client
-  client := &http.Client{}    
-  
-  // Setup api request
-  req, _ := http.NewRequest("GET", os.Getenv("SERVER_URL") + "/api/v1/accounts", nil)
-  req.Header.Set("Accept", "application/json")
-  req.Header.Set("Authorization", "Bearer " + os.Getenv("ACCESS_TOKEN"))   
- 
-  res, err := client.Do(req)
-      
+  // Make API request
+  body, err := MakeGetRequest("/api/v1/accounts")
+
   if err != nil {
-    log.Fatal(err)  
-  }        
-  
-  // Close Body
-  defer res.Body.Close()    
-  
-  // Make sure the api responded with a 200
-  if res.StatusCode != 200 {
-    log.Fatal(fmt.Sprint("/api/v1/accounts did not return a status code of 200 -", res.StatusCode))
-  }    
-     
-  // Read the data we got.
-  body, _ := ioutil.ReadAll(res.Body) 
+    log.Fatal(err)
+  }  
 
   // Loop through the accounts and print them
-  result := gjson.Parse(string(body))
+  result := gjson.Parse(body)
 
   // Loop through and build rows of output table.
   result.ForEach(func(key, value gjson.Result) bool {
@@ -241,23 +214,27 @@ func MarkAccountValue() {
   fmt.Println("") 
   fmt.Println("Account as been marked at $" + os.Args[3] + ".")
 
+  // Read the data we got.
+  body, _ := ioutil.ReadAll(res.Body)
+
+  if err != nil {
+    log.Fatal(err)
+  }  
+
   // Print record.
-  PrintOneAccountRow(res.Body)
+  PrintOneAccountRow(string(body))
 }
 
 //
 // Print one account row.
 //
-func PrintOneAccountRow(resBody io.ReadCloser) {
+func PrintOneAccountRow(body string) {
 
   // Set output data.
   var rows [][]string
 
   // Set money format
   ac := accounting.Accounting{Symbol: "$", Precision: 2}
-
-  // Read the data we got.
-  body, _ := ioutil.ReadAll(resBody)
 
   // Get the values we need.
   id := gjson.Get(string(body), "id").String()

@@ -20,6 +20,56 @@ import (
 )
 
 //
+// Do Ledger list.
+//
+func DoLedgerList() {
+
+  // Set output data.
+  var rows [][]string
+
+  // Set money format
+  ac := accounting.Accounting{Symbol: "$", Precision: 2}
+
+  // Make API request
+  body, err := MakeGetRequest("/api/v1/ledgers")
+
+  if err != nil {
+    log.Fatal(err)
+  }  
+
+  // Loop through the accounts and print them
+  result := gjson.Parse(body)
+
+  // Loop through and build rows of output table.
+  result.ForEach(func(key, value gjson.Result) bool {
+
+    // Get values from json
+    id := gjson.Get(value.String(), "id").String()
+    account_name := gjson.Get(value.String(), "account_name").String()
+    category_name := gjson.Get(value.String(), "category_name").String()
+    amount := gjson.Get(value.String(), "amount").Float()
+    date := gjson.Get(value.String(), "date").String() 
+    note := gjson.Get(value.String(), "note").String()     
+
+    // Parse dates.
+    layout := "2006-01-02T15:04:05Z"
+    d, _ := time.Parse(layout, date)
+
+    rows = append(rows, []string{ id, d.In(timeZone).Format("01/02/2006"), account_name, category_name, ac.FormatMoney(amount), note })
+
+    // keep iterating
+    return true
+  })
+
+  fmt.Println("")
+
+  // Print table and return.
+  PrintTable(rows, []string{ "Id", "Date", "Account", "Category", "Amount", "Note" })
+
+  fmt.Println("")
+}
+
+//
 // Create a new ledger.
 //
 func DoCreateLedger() {

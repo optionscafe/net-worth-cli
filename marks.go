@@ -7,13 +7,10 @@
 package main
 
 import (
-  "github.com/leekchan/accounting"
-  "github.com/tidwall/gjson"
-  "io/ioutil"
   "log"
-  "net/http"
-  "os"
   "time"
+  "github.com/tidwall/gjson"  
+  "github.com/leekchan/accounting"  
 )
 
 //
@@ -27,30 +24,12 @@ func ListMarks() {
   // Set money format
   ac := accounting.Accounting{Symbol: "$", Precision: 2}
 
-  // Setup http client
-  client := &http.Client{}
-
-  // Setup api request
-  req, _ := http.NewRequest("GET", os.Getenv("SERVER_URL")+"/api/v1/marks", nil)
-  req.Header.Set("Accept", "application/json")
-  req.Header.Set("Authorization", "Bearer "+os.Getenv("ACCESS_TOKEN"))
-
-  res, err := client.Do(req)
+  // Make API request
+  body, err := MakeGetRequest("/api/v1/marks")
 
   if err != nil {
     log.Fatal(err)
-  }
-
-  // Close Body
-  defer res.Body.Close()
-
-  // Make sure the api responded with a 200
-  if res.StatusCode == 404 {
-    log.Fatal("No results found.")
-  }
-
-  // Read the data we got.
-  body, _ := ioutil.ReadAll(res.Body)
+  } 
 
   // Loop through the accounts and print them
   result := gjson.Parse(string(body))
