@@ -7,83 +7,88 @@
 package main
 
 import (
-  "os"
-  "fmt"
-  "log"
-  "time"
-  "os/user"
-  "github.com/joho/godotenv"
-  "github.com/olekukonko/tablewriter"  
+	"fmt"
+	"log"
+	"os"
+	"os/user"
+	"time"
+
+	"github.com/joho/godotenv"
+	"github.com/olekukonko/tablewriter"
 )
 
 var (
-  timeZone *time.Location
+	timeZone *time.Location
 )
 
 //
 // Main...
 //
 func main() {
-    
-  // Get the current user.
-  usr, err := user.Current()
-    
-  if err != nil {
-    log.Fatal(err)
-  }
-    
-  // Load .env file 
-  err = godotenv.Load(usr.HomeDir + "/.net-worth-cli")
 
-  if err != nil {
-    log.Fatal("Error loading ~/.net-worth-cli file")
-  } 
+	// Get the current user.
+	usr, err := user.Current()
 
-  // Set location.
-  timeZone, _ = time.LoadLocation(os.Getenv("TIMEZONE"))
-     
-  // Make sure we have at least one arg
-  if len(os.Args) <= 1 {
-    PrintHelp()
-    return
-  }
+	if err != nil {
+		log.Fatal(err)
+	}
 
-  // Switch based on the first argument
-  switch os.Args[1] {
+	// Load .env file
+	err = godotenv.Load(usr.HomeDir + "/.net-worth-cli")
 
-    // List Accounts
-    case "accounts-list":
-      DoAccounts()
+	if err != nil {
+		log.Fatal("Error loading ~/.net-worth-cli file")
+	}
 
-    // Create Account
-    case "accounts-create":
-      DoCreateAccount()
+	// Set location.
+	timeZone, _ = time.LoadLocation(os.Getenv("TIMEZONE"))
 
-    // Mark Account
-    case "accounts-mark":
-      MarkAccountValue()
+	// Make sure we have at least one arg
+	if len(os.Args) <= 1 {
+		PrintHelp()
+		return
+	}
 
-    // List Marks
-    case "marks-list":
-      ListMarks()
+	// Switch based on the first argument
+	switch os.Args[1] {
 
-     // Create ledger entry
-    case "ledger-create":
-      DoCreateLedger()     
+	// List Accounts
+	case "accounts-list":
+		DoAccounts()
 
-     // List ledger entry
-    case "ledger-list":
-      DoLedgerList()  
+	// Create Account
+	case "accounts-create":
+		DoCreateAccount()
 
-    // Print Help
-    case "help":
-      PrintHelp()
+	// Mark Account
+	case "accounts-mark":
+		MarkAccountValue()
 
-    // Print Help
-    default:
-      PrintHelp()
+	// Fund Account
+	case "accounts-fund":
+		FundAccountValue()
 
-  }
+	// List Marks
+	case "marks-list":
+		ListMarks()
+
+		// Create ledger entry
+	case "ledger-create":
+		DoCreateLedger()
+
+		// List ledger entry
+	case "ledger-list":
+		DoLedgerList()
+
+	// Print Help
+	case "help":
+		PrintHelp()
+
+	// Print Help
+	default:
+		PrintHelp()
+
+	}
 
 }
 
@@ -92,17 +97,18 @@ func main() {
 //
 func PrintHelp() {
 
-  fmt.Println("")
-  fmt.Println("Actions:")
-  fmt.Println("\n help")
-  fmt.Println("\n marks-list")
-  fmt.Println("\n accounts-list")
-  fmt.Println("\n accounts-list {id}")
-  fmt.Println("\n accounts-mark {id} {balance}")   
-  fmt.Println("\n accounts-create \"{name}\" {balance}")
-  fmt.Println("\n ledger-list")  
-  fmt.Println("\n ledger-create {account_id} {date} {amount} \"{category_name}\" \"{note}\"")    
-  fmt.Println("")
+	fmt.Println("")
+	fmt.Println("Actions:")
+	fmt.Println("\n help")
+	fmt.Println("\n marks-list")
+	fmt.Println("\n accounts-list")
+	fmt.Println("\n accounts-list {id}")
+	fmt.Println("\n accounts-mark {id} {balance}")
+	fmt.Println("\n accounts-fund {id} {amount} \"{note}\"")
+	fmt.Println("\n accounts-create \"{name}\" {balance}")
+	fmt.Println("\n ledger-list")
+	fmt.Println("\n ledger-create {account_id} {date} {amount} \"{category_name}\" \"{note}\"")
+	fmt.Println("")
 }
 
 //
@@ -110,19 +116,19 @@ func PrintHelp() {
 //
 func PrintTable(rows [][]string, headers []string) {
 
-  // Print table to screen.
-  table := tablewriter.NewWriter(os.Stdout) 
+	// Print table to screen.
+	table := tablewriter.NewWriter(os.Stdout)
 
-  // Build table headers
-  table.SetHeader(headers) 
+	// Build table headers
+	table.SetHeader(headers)
 
-  // Build table rows
-  for _, v := range rows {
-    table.Append(v)
-  } 
+	// Build table rows
+	for _, v := range rows {
+		table.Append(v)
+	}
 
-  // Send output 
-  table.Render()
+	// Send output
+	table.Render()
 }
 
 /* End File */
