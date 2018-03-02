@@ -37,7 +37,8 @@ func main() {
 	err = godotenv.Load(usr.HomeDir + "/.net-worth-cli")
 
 	if err != nil {
-		log.Fatal("Error loading ~/.net-worth-cli file")
+		DoAuth()
+		return
 	}
 
 	// Set location.
@@ -80,6 +81,10 @@ func main() {
 	case "ledger-list":
 		DoLedgerList()
 
+	// Do Auth
+	case "auth":
+		DoAuth()
+
 	// Print Help
 	case "help":
 		PrintHelp()
@@ -100,6 +105,7 @@ func PrintHelp() {
 	fmt.Println("")
 	fmt.Println("Actions:")
 	fmt.Println("\n help")
+	fmt.Println("\n auth")
 	fmt.Println("\n marks-list")
 	fmt.Println("\n accounts-list")
 	fmt.Println("\n accounts-list {id}")
