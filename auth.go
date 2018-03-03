@@ -31,6 +31,9 @@ func DoAuth() {
 	fmt.Print("What is the URL to your Net Worth Server (https://example.com): ")
 	url, _ := reader.ReadString('\n')
 
+	fmt.Print("What is your client_id to your Net Worth Server: ")
+	clientId, _ := reader.ReadString('\n')
+
 	fmt.Print("What is your email address? (john@example.com): ")
 	email, _ := reader.ReadString('\n')
 
@@ -45,7 +48,7 @@ func DoAuth() {
 	}
 
 	// Send request to the server to get an access token.
-	access_token := SendLoginGetAccessToken(strings.TrimSuffix(url, "\n"), strings.TrimSuffix(email, "\n"), strings.TrimSuffix(password, "\n"))
+	access_token := SendLoginGetAccessToken(strings.TrimSuffix(url, "\n"), strings.TrimSuffix(email, "\n"), strings.TrimSuffix(password, "\n"), strings.TrimSuffix(clientId, "\n"))
 
 	// WRite the config file.
 	env, err := godotenv.Unmarshal("TIMEZONE=America/Los_Angeles\nSERVER_URL=" + url + "\nACCESS_TOKEN=" + access_token)
@@ -66,14 +69,14 @@ func DoAuth() {
 //
 // Send the login request to the server. And get an access token
 //
-func SendLoginGetAccessToken(url string, email string, password string) string {
-	var postStr = []byte(`{"email": "` + email + `","password": "` + password + `"}`)
+func SendLoginGetAccessToken(url string, email string, password string, clientId string) string {
+	var postStr = []byte(`{"username": "` + email + `","password": "` + password + `", "client_id": "` + clientId + `", "grant_type": "password"}`)
 
 	// Create client
 	client := &http.Client{}
 
 	// Create request
-	req, err := http.NewRequest("POST", url+"/login", bytes.NewBuffer(postStr))
+	req, err := http.NewRequest("POST", url+"/oauth/token", bytes.NewBuffer(postStr))
 
 	// Headers
 	req.Header.Set("Accept", "application/json")
@@ -99,7 +102,7 @@ func SendLoginGetAccessToken(url string, email string, password string) string {
 	}
 
 	// Return the access token
-	return gjson.Get(string(respBody), "session.access_token").String()
+	return gjson.Get(string(respBody), "access_token").String()
 }
 
 /* End File */
