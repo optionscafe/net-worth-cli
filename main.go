@@ -113,7 +113,7 @@ func PrintHelp() {
 	fmt.Println("\n accounts-fund {id} {amount} \"{note}\"")
 	fmt.Println("\n accounts-create \"{name}\" {balance}")
 	fmt.Println("\n ledger-list")
-	fmt.Println("\n ledger-create {account_id} {date} {amount} \"{category_name}\" \"{note}\"")
+	fmt.Println("\n ledger-create {account_id} {date} {amount} \"{category_name}\" {symbol} \"{note}\"")
 	fmt.Println("")
 }
 
